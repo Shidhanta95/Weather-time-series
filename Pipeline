@@ -1,37 +1,15 @@
 pipeline{
     agent any
-
-    stages{
-        stage("Extract Data"){
-            steps{
-                sh 'python3 loading_data.py'
-            }
-        }
-        stage("Data Analysis"){
-            steps{
-                sh 'python3 data_analysis.py'
-            }
-        }
-        stage("Data Preprocessing"){
-            steps{
-                sh 'python3 data_preprocessing.py'
-            }
-        }
-        stage("Data Visualization"){
-            steps{
-                sh 'python3 datavisualization.py'
-            }
-        }
-        stage("Feature Engineering"){
-            steps{
-                sh 'python3 feature_engineering.py'
-            }
-        }
+    environment{
+        airflow_instance_ip = credentials('airflow_instance_ip')
+        airflow_instance_private_key = credentials('airflow_key')
     }
-    post{
-       
-        always {
-            archiveArtifacts artifacts: 'cleaned_weather_series.csv', onlyIfSuccessful: true
-        }
+    stages{
+        
+        stage("Trigger Airflow Dag"){
+            steps{
+                 sh "python3 trigger_airflow_dag.py"
+                }
             }
+        }
 }
